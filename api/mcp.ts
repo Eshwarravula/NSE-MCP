@@ -10,13 +10,7 @@ import { getTopBulkBuys } from "../src/tools/topBulkBuys.js";
 import { getTopBulkSells } from "../src/tools/topBulkSells.js";
 import { getFiiDiiActivity } from "../src/tools/fiiDiiActivity.js";
 import { getAnnouncements } from "../src/tools/announcements.js";
-import { getMarketStatus } from "../src/tools/marketStatus.js";
-import { getNiftyIndices } from "../src/tools/indices.js";
-import { getTopGainers } from "../src/tools/topGainers.js";
-import { getTopLosers } from "../src/tools/topLosers.js";
-import { getMostActive } from "../src/tools/mostActive.js";
 import { searchBySymbol } from "../src/tools/searchBySymbol.js";
-import { getStockQuote } from "../src/tools/quote.js";
 import { getShortSelling } from "../src/tools/shortSelling.js";
 import { getCorporateActions } from "../src/tools/corporateActions.js";
 
@@ -38,17 +32,17 @@ const tools = [
   },
   {
     name: "get_latest_bulk_deals",
-    description: "Latest bulk deals sorted by trade value.",
+    description: "Latest NSE bulk deals sorted by trade value.",
     inputSchema: { type: "object", properties: { dealType: { type: "string", enum: ["BUY", "SELL", "ALL"] } } },
   },
   {
     name: "get_top_bulk_buys",
-    description: "Largest bulk-deal purchases ranked by trade value.",
+    description: "Largest NSE bulk-deal purchases ranked by trade value.",
     inputSchema: { type: "object", properties: { limit: { type: "number" }, symbol: { type: "string" } } },
   },
   {
     name: "get_top_bulk_sells",
-    description: "Largest bulk-deal sales ranked by trade value.",
+    description: "Largest NSE bulk-deal sales ranked by trade value.",
     inputSchema: { type: "object", properties: { limit: { type: "number" }, symbol: { type: "string" } } },
   },
   {
@@ -62,39 +56,9 @@ const tools = [
     inputSchema: { type: "object", properties: { symbol: { type: "string" }, daysBack: { type: "number" }, limit: { type: "number" } } },
   },
   {
-    name: "get_market_status",
-    description: "Current NSE market status and live index levels.",
-    inputSchema: { type: "object", properties: {} },
-  },
-  {
-    name: "get_nifty_indices",
-    description: "Live NSE index levels, changes, ranges and breadth.",
-    inputSchema: { type: "object", properties: { name: { type: "string" } } },
-  },
-  {
-    name: "get_top_gainers",
-    description: "Top gaining NSE stocks within an index.",
-    inputSchema: { type: "object", properties: { index: { type: "string" }, limit: { type: "number" } } },
-  },
-  {
-    name: "get_top_losers",
-    description: "Top losing NSE stocks within an index.",
-    inputSchema: { type: "object", properties: { index: { type: "string" }, limit: { type: "number" } } },
-  },
-  {
-    name: "get_most_active",
-    description: "Most actively traded NSE stocks by traded value.",
-    inputSchema: { type: "object", properties: { index: { type: "string" }, limit: { type: "number" } } },
-  },
-  {
     name: "search_by_symbol",
-    description: "Combined view of bulk deals, block deals, insider trades and announcements for one NSE stock.",
+    description: "Combined view of NSE bulk deals, block deals, insider trades and announcements for one stock.",
     inputSchema: { type: "object", properties: { symbol: { type: "string" }, daysBack: { type: "number" } }, required: ["symbol"] },
-  },
-  {
-    name: "get_quote",
-    description: "Live NSE/BSE stock quote with valuation and market statistics.",
-    inputSchema: { type: "object", properties: { symbol: { type: "string" } }, required: ["symbol"] },
   },
   {
     name: "get_short_selling",
@@ -150,31 +114,10 @@ function createServer() {
         case "get_nse_announcements":
           result = await getAnnouncements({ symbol: str("symbol"), daysBack: num("daysBack"), limit: num("limit") });
           break;
-        case "get_market_status":
-          result = await getMarketStatus();
-          break;
-        case "get_nifty_indices":
-          result = await getNiftyIndices({ name: str("name") });
-          break;
-        case "get_top_gainers":
-          result = await getTopGainers({ index: str("index"), limit: num("limit") });
-          break;
-        case "get_top_losers":
-          result = await getTopLosers({ index: str("index"), limit: num("limit") });
-          break;
-        case "get_most_active":
-          result = await getMostActive({ index: str("index"), limit: num("limit") });
-          break;
         case "search_by_symbol": {
           const symbol = str("symbol");
           if (!symbol) throw new Error("symbol is required");
           result = await searchBySymbol({ symbol, daysBack: num("daysBack") });
-          break;
-        }
-        case "get_quote": {
-          const symbol = str("symbol");
-          if (!symbol) throw new Error("symbol is required");
-          result = await getStockQuote({ symbol });
           break;
         }
         case "get_short_selling":
